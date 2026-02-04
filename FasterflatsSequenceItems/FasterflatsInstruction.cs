@@ -81,6 +81,9 @@ namespace NaixxGithub.NINA.Fasterflats.FasterflatsTestCategory {
             AnnotateImage = copyMe.AnnotateImage;
             DetectStars = copyMe.DetectStars;
             AutoStretch = copyMe.AutoStretch;
+            Debayering = copyMe.Debayering;
+            savedDebayeredHFR = copyMe.savedDebayeredHFR;
+            savedUnlinkedStretch = copyMe.savedUnlinkedStretch;
         }
 
         private bool? _annotateImage;
@@ -120,6 +123,19 @@ namespace NaixxGithub.NINA.Fasterflats.FasterflatsTestCategory {
             }
         }
 
+        private bool? debayering;
+        private bool? savedDebayeredHFR;
+        private bool? savedUnlinkedStretch;
+
+        [JsonProperty]
+        public bool? Debayering {
+            get => debayering;
+            set {
+                debayering = value;
+                OnPropertyChanged(); 
+            }
+        }
+
         /// <summary>
         /// The core logic when the sequence item is running resides here
         /// Add whatever action is necessary
@@ -133,6 +149,23 @@ namespace NaixxGithub.NINA.Fasterflats.FasterflatsTestCategory {
             imageSettings.AnnotateImage = AnnotateImage ?? imageSettings.AnnotateImage;
             imageControlVm.AutoStretch = AutoStretch ?? imageControlVm.AutoStretch;
             imageControlVm.DetectStars = DetectStars ?? imageControlVm.DetectStars;
+
+            // Handle Debayering with state restoration
+            if (Debayering.HasValue) {
+                if (Debayering == false) {
+                    // Disable debayering: store current states and set to false
+                    savedDebayeredHFR = imageSettings.DebayeredHFR;
+                    savedUnlinkedStretch = imageSettings.UnlinkedStretch;
+                    imageSettings.DebayerImage = false;
+                    imageSettings.DebayeredHFR = false;
+                    imageSettings.UnlinkedStretch = false;
+                } else if (Debayering == true) {
+                    // Enable debayering: restore saved states or use defaults
+                    imageSettings.DebayerImage = true;
+                    imageSettings.DebayeredHFR = savedDebayeredHFR ?? true;
+                    imageSettings.UnlinkedStretch = savedUnlinkedStretch ?? true;
+                }
+            }
 
             // Add logic to run the item here
             return Task.CompletedTask;

@@ -172,6 +172,15 @@
 
                         IsChecked="{Binding DetectStars}" />
 
+                    <TextBlock VerticalAlignment="Center" Text="Debayering:" />
+                    <CheckBox
+                        Style="{StaticResource TriStateCheckBox}"
+                        MinWidth="120"
+                        Margin="5,0,0,0"
+                        VerticalAlignment="Center"
+
+                        IsChecked="{Binding Debayering}" />
+
 
                 </StackPanel>
             </nina:SequenceBlockView.SequenceItemContent>
